@@ -1,0 +1,18 @@
+# Examen 1 - Recombinación
+
+import numpy as np
+
+P1 = np.array([1,0,1,1,1,0,0,0]) # Padre 1
+P2 = np.array([0,0,1,0,1,0,1,0]) # Padre 2
+
+while(True):
+    try:
+        split = int(input("Seleccione el punto de recombinacion: ")) # Input del usuario
+        if split <= 0 or split >= P1.shape[0]: # Asegurarse que sea corte valido
+            raise Exception()
+        print(f"Hijo 1: {np.concatenate((P1[:split], P2[split:]))}")
+        print(f"Hijo 2: {np.concatenate((P2[:split], P1[split:]))}")
+        break
+
+    except:
+        print("Punto de corte no valido...")

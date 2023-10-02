@@ -1,0 +1,36 @@
+# Actividad 4
+
+import numpy as np
+
+P1 = np.random.randint(0,2,8) # Padre 1
+print("Padre: ", P1)
+P2 = np.random.randint(0,2,8) # Padre 2
+print("Madre: ", P2)
+
+while(True):
+    try:
+        split = int(input("Seleccione el punto de recombinacion: ")) # Input del usuario
+        if split <= 0 or split >= P1.shape[0]: # Asegurarse que sea corte valido
+            raise Exception()
+        
+        # Recombinación
+        H1 = np.concatenate((P1[:split], P2[split:]))
+        H2 = np.concatenate((P2[:split], P1[split:]))
+        print(f"Hijo 1: {H1}")
+        print(f"Hijo 2: {H2}")
+
+        gene_mutation = np.random.randint(1,9) # Seleccionar gen a mutar
+        print("Gen Mutado: ", gene_mutation)
+        gene_mutation = gene_mutation - 1
+        
+        # Mutación
+        H1[gene_mutation] = 1 - H1[gene_mutation]
+        H2[gene_mutation] = 1 - H2[gene_mutation]
+
+        print(f"Hijo 1: {H1}")
+        print(f"Hijo 2: {H2}")
+
+        break
+
+    except:
+        print("Punto de corte no valido...")

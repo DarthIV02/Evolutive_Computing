@@ -1,0 +1,65 @@
+#Actividad 7 - Selección Aleatoria
+
+import numpy as np
+import math
+
+def repair_func(poblation, capacity, weights):
+    for i in range(poblation.shape[0]):
+        
+        knapsack_full = True if np.dot(weights, poblation[i]) > capacity else False
+            
+        while knapsack_full == True:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 0
+                knapsack_full = False if np.dot(weights, poblation[i]) < capacity else True
+                    
+        while knapsack_full == False:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 1
+                if np.dot(weights, poblation[i]) > capacity:
+                    poblation[i, j] = 0
+                    knapsack_full = True
+
+def selection_top_down(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    father, mother = range(1,max+1,2), range(0,max+1,2)
+    return father, mother
+
+def selection_random(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    father, mother = np.random.randint(0,max+1,int(math.floor(max/2))), np.random.randint(0,max+1,int(math.ceil(max/2)))
+    print("Seleccionados: ", np.concatenate((father,mother))+1)
+    return father, mother
+
+# Input of user
+print("Bienvenidos al menu de métodos de selección")
+size_def = int(input("Tamaño de la población: "))
+length = int(input("Longitud del cromosoma: "))
+X_rate = float(input("Tasa de selección (0 a 1): "))
+
+# Create values
+poblation = np.random.randint(2, size=(size_def, length)) # Cromosomas, objetos = Size
+weights = np.random.uniform(1, 10, size=(length))
+capacity = np.sum(weights)/2
+value = np.random.uniform(1, 100, size=(length))
+
+# Repair
+repair_func(poblation, capacity, weights)
+print("Población Inicial: \n", poblation)
+
+# Selection
+print("TDP = Metodo de seleccion arriba-abajo")
+print("RP = Metodo de seleccion aleatoria")
+
+while (True):
+    metodo = input("¿Qué metodo desea seleccionar?")
+    if (metodo == "TDP"):
+        father_id, mother_id = selection_top_down(poblation, X_rate)
+    elif (metodo == "RP"):
+        father_id, mother_id = selection_random(poblation, X_rate)
+    else:
+        print("Opcion no valida intente nuevamente")
+        continue
+    print("Padres: \n", poblation[father_id])
+    print("Madres: \n", poblation[mother_id])
+    break

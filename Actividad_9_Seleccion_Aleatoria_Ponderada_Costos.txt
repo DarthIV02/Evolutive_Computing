@@ -1,0 +1,71 @@
+import numpy as np
+import bisect as b
+
+def repair_func(poblation, capacity, weights):
+    for i in range(poblation.shape[0]):
+        
+        knapsack_full = True if np.dot(weights, poblation[i]) > capacity else False
+            
+        while knapsack_full == True:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 0
+                knapsack_full = False if np.dot(weights, poblation[i]) < capacity else True
+                    
+        while knapsack_full == False:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 1
+                if np.dot(weights, poblation[i]) > capacity:
+                    poblation[i, j] = 0
+                    knapsack_full = True
+
+def selection_weighted_cost(poblation, x_rate, cost):
+    # How many selected
+    max = int((poblation.shape[0]*x_rate))
+    random_selection = np.random.rand(max+1)
+    
+    # Select ids
+    not_selected, selected = np.argsort(cost)[:max], np.argsort(cost)[max:]
+    fitness_not_selected, fitness_selected = cost[not_selected], cost[selected] # Map fitness
+    print("Cromosomas descartados: \n", fitness_not_selected)
+    
+    # Show minimum from not selected
+    index_min = np.argmin(fitness_not_selected)
+    print("Cromosoma descartado: ", poblation[not_selected[index_min]])
+    print("Fitness del Cromosoma descartado: ", fitness_not_selected[index_min])
+
+    # Normalize cost
+    c_n = fitness_selected - fitness_not_selected[index_min]
+    print("Valores de C_n: \n", c_n)
+
+    p_n = np.abs(c_n / np.sum(c_n))
+    print("valores Pn: \n", p_n)
+
+    for i in range(1, p_n.shape[0]):
+        p_n[i] += p_n[i-1]
+    print("Sumatoria de las probabilidades: \n", p_n)
+
+    father = []
+    mother = []
+    for i in range(p_n.shape[0]):
+        x = b.bisect(p_n, random_selection[i])
+        print("x: ", x)
+        if (i % 2 == 1):
+            father.append(selected[x])
+        else:
+            mother.append(selected[x])
+    return father, mother
+
+poblation = np.random.randint(2, size=(7, 10)) # Cromosomas, objetos = Size
+weights = np.random.uniform(1, 10, size=(10))
+capacity = np.sum(weights)/2
+value = weights + 5
+X_rate = 0.5
+repair_func(poblation, capacity, weights)
+print("Población Reparada: \n", poblation)
+print("Pesos de los objetos: \n", weights)
+print("Valores de cada objeto: \n", value)
+cost = np.dot(poblation, value)
+print("Costo (fitness) de cada cromosoma: \n", cost)
+father_id, mother_id = selection_weighted_cost(poblation, X_rate, cost)
+print("Padres: \n", poblation[father_id])
+print("Madres: \n", poblation[mother_id])

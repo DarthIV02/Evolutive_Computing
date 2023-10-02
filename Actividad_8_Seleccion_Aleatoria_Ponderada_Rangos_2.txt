@@ -1,0 +1,89 @@
+# Actividad 8: Selección Aleatoria Ponderada por Rangos - Completa
+
+import numpy as np
+import math
+
+def repair_func(poblation, capacity, weights):
+    for i in range(poblation.shape[0]):
+        
+        knapsack_full = True if np.dot(weights, poblation[i]) > capacity else False
+            
+        while knapsack_full == True:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 0
+                knapsack_full = False if np.dot(weights, poblation[i]) < capacity else True
+                    
+        while knapsack_full == False:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 1
+                if np.dot(weights, poblation[i]) > capacity:
+                    poblation[i, j] = 0
+                    knapsack_full = True
+
+def selection_top_down(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    father, mother = range(1,max+1,2), range(0,max+1,2)
+    return father, mother
+
+def selection_random(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    father, mother = np.random.randint(0,max+1,int(math.floor(max/2))), np.random.randint(0,max+1,int(math.ceil(max/2)))
+    print("Seleccionados: ", np.concatenate((father,mother))+1)
+    return father, mother
+
+def selection_rank_weighted_random(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    random_selection = np.random.rand(max)
+    print("Aleatorio: ", random_selection)
+    values = np.array([i for i in range(1,max+1)])
+    sum_total = np.sum(values)
+    sum_pi = ((max - (values) + 1)/sum_total)
+    for i in range(1, sum_pi.shape[0]):
+        sum_pi[i] += sum_pi[i-1]
+    print("SumPi: ", sum_pi)
+    father = []
+    mother = []
+    for i in range(sum_pi.shape[0]):
+        x = b.bisect(sum_pi, random_selection[i])
+        print("x: ", x)
+        if (i % 2 == 1):
+            father.append(x)
+        else:
+            mother.append(x)
+    return father, mother
+
+# Input of user
+print("Bienvenidos al menu de métodos de selección")
+size_def = int(input("Tamaño de la población: "))
+length = int(input("Longitud del cromosoma: "))
+X_rate = float(input("Tasa de selección (0 a 1): "))
+
+# Create values
+poblation = np.random.randint(2, size=(size_def, length)) # Cromosomas, objetos = Size
+weights = np.random.uniform(1, 10, size=(length))
+capacity = np.sum(weights)/2
+value = np.random.uniform(1, 100, size=(length))
+
+# Repair
+repair_func(poblation, capacity, weights)
+print("Población Inicial: \n", poblation)
+
+# Selection
+print("TDP = Metodo de seleccion arriba-abajo")
+print("RP = Metodo de seleccion aleatoria")
+print("RWP = Metodo de seleccion aleatoria ponderado por rangos")
+
+while (True):
+    metodo = input("¿Qué metodo desea seleccionar?")
+    if (metodo == "TDP"):
+        father_id, mother_id = selection_top_down(poblation, X_rate)
+    elif (metodo == "RP"):
+        father_id, mother_id = selection_random(poblation, X_rate)
+    elif (metodo == "RWP"):
+        father_id, mother_id = selection_rank_weighted_random(poblation, X_rate)
+    else:
+        print("Opcion no valida intente nuevamente")
+        continue
+    print("Padres: \n", poblation[father_id])
+    print("Madres: \n", poblation[mother_id])
+    break

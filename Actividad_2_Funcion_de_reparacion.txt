@@ -1,0 +1,36 @@
+# Actividad 2 - Crear la función de reparación
+
+import numpy as np
+
+def repair_func(poblation, capacity, weights):
+    for i in range(poblation.shape[0]):
+        knapsack_full = False
+        if np.dot(weights, poblation[i]) > capacity:
+            knapsack_full = True
+            while knapsack_full == True:
+                for j in range(poblation.shape[1]):
+                    poblation[i, j] = 0
+                    if np.dot(weights, poblation[i]) < capacity:
+                        knapsack_full = False
+            while knapsack_full == False:
+                for j in range(poblation.shape[1]):
+                    poblation[i, j] = 1
+                    if np.dot(weights, poblation[i]) > capacity:
+                        poblation[i, j] = 0
+                        knapsack_full = True
+
+poblation = np.random.randint(2, size=(5, 3)) # Cromosomas, objetos = Size
+weights = np.random.uniform(1, 10, size=(3))
+capacity = np.sum(weights)/2
+
+print("Capacity\n", capacity)
+
+print("Poblation\n", poblation)
+print("Weights\n", weights)
+print("Function before: \n", np.dot(poblation, weights))
+
+repair_func(poblation, capacity, weights)
+print("------------------------------------------------")
+
+print("Poblation\n", poblation)
+print("Function after: \n", np.dot(poblation, weights))

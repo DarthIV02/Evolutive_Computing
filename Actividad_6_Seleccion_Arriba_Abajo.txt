@@ -1,0 +1,36 @@
+#Actividad 6 - Metodo de Selección arriba-abajo
+
+import numpy as np
+
+def repair_func(poblation, capacity, weights):
+    for i in range(poblation.shape[0]):
+        
+        knapsack_full = True if np.dot(weights, poblation[i]) > capacity else False
+            
+        while knapsack_full == True:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 0
+                knapsack_full = False if np.dot(weights, poblation[i]) < capacity else True
+                    
+        while knapsack_full == False:
+            for j in range(poblation.shape[1]):
+                poblation[i, j] = 1
+                if np.dot(weights, poblation[i]) > capacity:
+                    poblation[i, j] = 0
+                    knapsack_full = True
+
+def selection_top_down(poblation, x_rate):
+    max = int((poblation.shape[0]*x_rate))
+    father, mother = range(1,max,2), range(0,max,2)
+    return father, mother
+
+poblation = np.random.randint(2, size=(10, 10)) # Cromosomas, objetos = Size
+weights = np.random.uniform(1, 10, size=(10))
+capacity = np.sum(weights)/2
+value = np.random.uniform(1, 100, size=(10))
+X_rate = 0.5
+repair_func(poblation, capacity, weights)
+print("Población Inicial: \n", poblation)
+father_id, mother_id = selection_top_down(poblation, X_rate)
+print("Padres: \n", poblation[father_id])
+print("Madres: \n", poblation[mother_id])
